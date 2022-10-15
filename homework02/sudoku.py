@@ -234,9 +234,11 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     grid = solve(grid)
     N = N if N <= 81 else 81
     for i in range(81 - N):
-        x, y = randint(0, 8), randint(0, 8)
+        x = randint(0, 8)
+        y = randint(0, 8)
         while grid[x][y] == ".":
-            x, y = randint(0, 8), randint(0, 8)
+            x = randint(0, 8)
+            y = randint(0, 8)
         grid[x][y] = "."
     return grid
 
