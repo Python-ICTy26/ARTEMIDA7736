@@ -245,8 +245,9 @@ if __name__ == "__main__":
     for fname in ["puzzle1.txt", "puzzle2.txt", "puzzle3.txt"]:
         grid = read_sudoku(fname)
         display(grid)
-        solution = solve(grid)
-        if not solution:
+        solution = deepcopy(grid)
+        solution = solve(solution)
+        if grid == solution:
             print(f"Puzzle {fname} can't be solved")
         else:
             display(solution)
