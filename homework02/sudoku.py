@@ -170,8 +170,8 @@ def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
     if not emptypos:
         return grid
     else:
-        possible_values = find_possible_values(grid, emptypospos)
-    for value in possibvalues:
+        possiblevalues = find_possible_values(grid, emptypos)
+    for value in possiblevalues:
         grid[emptypos[0]][emptypos[1]] = value
         solution = solve(grid)
         if solution:
