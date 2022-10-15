@@ -246,7 +246,7 @@ if __name__ == "__main__":
         grid = read_sudoku(fname)
         display(grid)
         solution = solve(grid)
-        if grid == solution:
+        if not solution:
             print(f"Puzzle {fname} can't be solved")
         else:
             display(solution)
