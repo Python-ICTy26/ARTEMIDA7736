@@ -230,15 +230,15 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     >>> check_solution(solution)
     True
     """
-    setka = solve([["."] * 9 for _ in range(9)])
-    schet = 0
-    while schet < 81 - N:
-        x = randint(0, 8)
-        y = randint(0, 8)
-        if setka[x][y] != ".":
-            setka[x][y] = "."
-            schet += 1
-    return setka
+    grid = [["." for i in range(9)] for j in range(9)]
+    grid = solve(grid)
+    N = N if N <= 81 else 81
+    for i in range(81 - N):
+        x, y = randint(0, 8), randint(0, 8)
+        while grid[x][y] == ".":
+            x, y = randint(0, 8), randint(0, 8)
+        grid[x][y] = "."
+    return grid
 
 
 if __name__ == "__main__":
