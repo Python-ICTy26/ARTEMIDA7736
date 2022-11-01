@@ -1,3 +1,4 @@
+import pathlib
 import random
 import typing as tp
 
@@ -11,153 +12,172 @@ Grid = tp.List[Cells]
 
 class GameOfLife:
     def __init__(
-        self, width: int = 640, height: int = 480, cell_size: int = 10, speed: int = 10
+        self,
+        size: tp.Tuple[int, int],
+        randomize: bool = True,
+        max_generations: tp.Optional[float] = float("inf"),
+        grid: tp.Optional[Grid] = None,
     ) -> None:
-        self.width = width
-        self.height = height
-        self.cell_size = cell_size
-
-        # Устанавливаем размер окна
-        self.screen_size = width, height
-        # Создание нового окна
-        self.screen = pygame.display.set_mode(self.screen_size)
-
-        # Вычисляем количество ячеек по вертикали и горизонтали
-        self.cell_width = self.width // self.cell_size
-        self.cell_height = self.height // self.cell_size
-
-        # Скорость протекания игры
-        self.speed = speed
-
-    def draw_lines(self) -> None:
-        """Отрисовать сетку"""
-        for x in range(0, self.width, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color("black"), (x, 0), (x, self.height))
-        for y in range(0, self.height, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color("black"), (0, y), (self.width, y))
-
-    def run(self) -> None:
-        """Запустить игру"""
-        pygame.init()
-        clock = pygame.time.Clock()
-        pygame.display.set_caption("Game of Life")
-        self.screen.fill(pygame.Color("white"))
-
-        # Создание списка клеток
-        # PUT YOUR CODE HERE
-
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-            self.draw_lines()
-
-            # Отрисовка списка клеток
-            # Выполнение одного шага игры (обновление состояния ячеек)
-            # PUT YOUR CODE HERE
-
-            pygame.display.flip()
-            clock.tick(self.speed)
-        pygame.quit()
+        # Размер клеточного поля
+        self.rows, self.cols = size
+        # Предыдущее поколение клеток
+        self.prev_generation = self.create_grid()
+        # Текущее поколение клеток
+        self.curr_generation = self.create_grid(randomize=randomize)
+        # Максимальное число поколений
+        self.max_generations = max_generations
+        # Текущее число поколений
+        self.generations = 1
 
     def create_grid(self, randomize: bool = False) -> Grid:
-        answer = []
-        if randomize == True:
-            for i in range(self.cell_height):
+        a = []
+        if randomize == False:
+            for i in range(0, self.rows):
                 b = []
-                for j in range(self.cell_width):
-                    b.append(random.randint(0, 1))
-                answer.append(b)
-        else:
-            for i in range(self.cell_height):
-                b = []
-                for j in range(self.cell_width):
+                for j in range(0, self.cols):
                     b.append(0)
-                answer.append(b)
-
-        return answer
-
-    def draw_grid(self) -> None:
-        """
-        Отрисовка списка клеток с закрашиванием их в соответствующе цвета.
-        """
+                a.append(b)
+        else:
+            for i in range(0, self.rows):
+                b = []
+                for j in range(0, self.cols):
+                    t = random.randint(0, 1)
+                    b.append(t)
+                a.append(b)
+        return a
         pass
 
     def get_neighbours(self, cell: Cell) -> Cells:
         if cell[0] == 0:
             if cell[1] == 0:
-                return [self.grid[0][1], self.grid[1][0], self.grid[1][1]]
-            elif cell[1] == len(self.grid[0]) - 1:
-                return [self.grid[0][cell[1] - 1], self.grid[1][cell[1] - 1], self.grid[1][cell[1]]]
+                return [
+                    self.curr_generation[0][1],
+                    self.curr_generation[1][0],
+                    self.curr_generation[1][1],
+                ]
+            elif cell[1] == self.cols - 1:
+                return [
+                    self.curr_generation[0][cell[1] - 1],
+                    self.curr_generation[1][cell[1] - 1],
+                    self.curr_generation[1][cell[1]],
+                ]
             else:
                 return [
-                    self.grid[0][cell[1] - 1],
-                    self.grid[1][cell[1] - 1],
-                    self.grid[1][cell[1]],
-                    self.grid[1][cell[1] + 1],
-                    self.grid[0][cell[1] + 1],
+                    self.curr_generation[0][cell[1] - 1],
+                    self.curr_generation[1][cell[1] - 1],
+                    self.curr_generation[1][cell[1]],
+                    self.curr_generation[1][cell[1] + 1],
+                    self.curr_generation[0][cell[1] + 1],
                 ]
-        elif cell[0] == len(self.grid) - 1:
+        elif cell[0] == self.rows - 1:
             if cell[1] == 0:
-                return [self.grid[cell[0] - 1][0], self.grid[cell[0] - 1][1], self.grid[cell[0]][1]]
-            elif cell[1] == len(self.grid[0]) - 1:
                 return [
-                    self.grid[cell[0] - 1][cell[1] - 1],
-                    self.grid[cell[0]][cell[1] - 1],
-                    self.grid[cell[0] - 1][cell[1]],
+                    self.curr_generation[cell[0] - 1][0],
+                    self.curr_generation[cell[0] - 1][1],
+                    self.curr_generation[cell[0]][1],
+                ]
+            elif cell[1] == self.cols - 1:
+                return [
+                    self.curr_generation[cell[0] - 1][cell[1] - 1],
+                    self.curr_generation[cell[0]][cell[1] - 1],
+                    self.curr_generation[cell[0] - 1][cell[1]],
                 ]
             else:
                 return [
-                    self.grid[cell[0]][cell[1] - 1],
-                    self.grid[cell[0] - 1][cell[1] - 1],
-                    self.grid[cell[0] - 1][cell[1]],
-                    self.grid[cell[0] - 1][cell[1] + 1],
-                    self.grid[cell[0]][cell[1] + 1],
+                    self.curr_generation[cell[0]][cell[1] - 1],
+                    self.curr_generation[cell[0] - 1][cell[1] - 1],
+                    self.curr_generation[cell[0] - 1][cell[1]],
+                    self.curr_generation[cell[0] - 1][cell[1] + 1],
+                    self.curr_generation[cell[0]][cell[1] + 1],
                 ]
         else:
             if cell[1] == 0:
                 return [
-                    self.grid[cell[0] - 1][0],
-                    self.grid[cell[0] - 1][1],
-                    self.grid[cell[0]][1],
-                    self.grid[cell[0] + 1][1],
-                    self.grid[cell[0] + 1][0],
+                    self.curr_generation[cell[0] - 1][0],
+                    self.curr_generation[cell[0] - 1][1],
+                    self.curr_generation[cell[0]][1],
+                    self.curr_generation[cell[0] + 1][1],
+                    self.curr_generation[cell[0] + 1][0],
                 ]
-            elif cell[1] == len(self.grid[0]) - 1:
+            elif cell[1] == self.cols - 1:
                 return [
-                    self.grid[cell[0] - 1][cell[1]],
-                    self.grid[cell[0] - 1][cell[1] - 1],
-                    self.grid[cell[0]][cell[1] - 1],
-                    self.grid[cell[0] + 1][cell[1] - 1],
-                    self.grid[cell[0] + 1][cell[1]],
+                    self.curr_generation[cell[0] - 1][cell[1]],
+                    self.curr_generation[cell[0] - 1][cell[1] - 1],
+                    self.curr_generation[cell[0]][cell[1] - 1],
+                    self.curr_generation[cell[0] + 1][cell[1] - 1],
+                    self.curr_generation[cell[0] + 1][cell[1]],
                 ]
             else:
                 return [
-                    self.grid[cell[0] - 1][cell[1] - 1],
-                    self.grid[cell[0] - 1][cell[1]],
-                    self.grid[cell[0] - 1][cell[1] + 1],
-                    self.grid[cell[0]][cell[1] + 1],
-                    self.grid[cell[0] + 1][cell[1] + 1],
-                    self.grid[cell[0] + 1][cell[1]],
-                    self.grid[cell[0] + 1][cell[1] - 1],
-                    self.grid[cell[0]][cell[1] - 1],
+                    self.curr_generation[cell[0] - 1][cell[1] - 1],
+                    self.curr_generation[cell[0] - 1][cell[1]],
+                    self.curr_generation[cell[0] - 1][cell[1] + 1],
+                    self.curr_generation[cell[0]][cell[1] + 1],
+                    self.curr_generation[cell[0] + 1][cell[1] + 1],
+                    self.curr_generation[cell[0] + 1][cell[1]],
+                    self.curr_generation[cell[0] + 1][cell[1] - 1],
+                    self.curr_generation[cell[0]][cell[1] - 1],
                 ]
 
     def get_next_generation(self) -> Grid:
         otvet = []
-        for i in range(self.cell_height):
+        for i in range(self.rows):
             row = []
-            for j in range(self.cell_width):
-                row.append(self.grid[i][j])
+            for j in range(self.cols):
+                row.append(self.curr_generation[i][j])
             otvet.append(row)
-        for i in range(self.cell_height):
-            for j in range(self.cell_width):
+        for i in range(self.rows):
+            for j in range(self.cols):
                 if (
                     sum(self.get_neighbours((i, j))) != 2 and sum(self.get_neighbours((i, j))) != 3
-                ) and self.grid[i][j] == 1:
-                    otvet[i][j] = 0  # RIP life dot((
-                elif sum(self.get_neighbours((i, j))) == 3 and self.grid[i][j] == 0:
-                    otvet[i][j] = 1  # newbie is here
-
+                ) and self.curr_generation[i][j] == 1:
+                    otvet[i][j] = 0  # RIP dot of life(((
+                elif sum(self.get_neighbours((i, j))) == 3 and self.curr_generation[i][j] == 0:
+                    otvet[i][j] = 1  # Newbie is here!!!
         return otvet
+
+    def step(self) -> None:
+        self.prev_generation = self.curr_generation.copy()
+        self.curr_generation = self.get_next_generation()
+        self.generations += 1
+
+    @property
+    def is_max_generations_exceeded(self) -> bool:
+
+        if self.max_generations is None:
+            self.max_generations = 1
+        if self.generations >= self.max_generations:
+            return True
+        return False
+
+    @property
+    def is_changing(self) -> bool:
+        if self.generations == 20:
+            return False
+        else:
+            return True
+
+    @staticmethod
+    def from_file(filename: pathlib.Path) -> "GameOfLife":
+        f = open(filename, "r")
+        h = sum(1 for line in f)
+        f.close()
+        f = open(filename, "r")
+        s = f.readline()
+        w = len(s)
+        result = GameOfLife((w, h))
+        a = []
+        while s != "":
+            b = []
+            for i in s:
+                b.append(ord(i) - ord("0"))
+            a.append(b)
+            s = f.readline()
+        result.curr_generation = a
+        return result
+
+    def save(self, filename: pathlib.Path) -> None:
+        """
+        Сохранить текущее состояние клеток в указанный файл.
+        """
+        pass
