@@ -8,6 +8,7 @@ __pycache__/
 # Unit tests / coverage reports
 .coverage
 .cache
+venv/
 coverage.xml
 
 # Mypy cache
