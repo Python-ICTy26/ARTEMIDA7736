@@ -180,4 +180,8 @@ class GameOfLife:
         """
         Сохранить текущее состояние клеток в указанный файл.
         """
-        pass
+        f = open(filename, "w")
+        for i in self.curr_generation:
+            for c in i:
+                f.write(str(c))
+            f.write("\n")
