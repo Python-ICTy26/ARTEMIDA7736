@@ -82,6 +82,13 @@ class GameOfLife:
         """
         Отрисовка списка клеток с закрашиванием их в соответствующе цвета.
         """
+        matrix: Grid
+        matrix = [[0] * self.cell_width for i in range(self.cell_height)]
+        if randomize:
+            for i in range(self.cell_height):
+                for j in range(self.cell_width):
+                    matrix[i][j] = random.randint(0, 1)
+        return matrix
         pass
 
     def get_neighbours(self, cell: Cell) -> Cells:
