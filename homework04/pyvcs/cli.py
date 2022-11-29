@@ -13,6 +13,7 @@ def cmd_init(args: argparse.Namespace) -> None:
     gitdir = repo_create(args.path)
     print(f"Initialized empty pyvcs repository in {gitdir.absolute()}")
 
+
 def cmd_hash_object(args: argparse.Namespace) -> None:
     with args.path.open(mode="rb") as f:
         data = f.read()
@@ -61,7 +62,6 @@ def cmd_rev_parse(args: argparse.Namespace) -> None:
 
 def cmd_symbolic_ref(args: argparse.Namespace) -> None:
     gitdir = repo_find()
-    
 
 
 def cmd_commit(args: argparse.Namespace) -> None:
